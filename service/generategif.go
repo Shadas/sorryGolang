@@ -25,6 +25,14 @@ type GenerateGifParam struct {
 	TemplateType string   `json:"template_type"`
 }
 
+func PreflightGenerateGif(ctx *gin.Context) {
+	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT")
+	ctx.Header("Access-Control-Allow-Headers", "X-Custom-Header")
+	obj := gin.H{"code": fmt.Sprintf("%d", http.StatusOK), "message": "操作成功"}
+	ctx.JSON(http.StatusOK, obj)
+}
+
 func GenerateGif(ctx *gin.Context) {
 	ggp := GenerateGifParam{}
 	if err := ctx.ShouldBindJSON(&ggp); err != nil {
@@ -46,6 +54,9 @@ func GenerateGif(ctx *gin.Context) {
 		return
 	}
 	gifId := strings.Split(strings.Split(gifFile, "/")[1], ".")[0]
+	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT")
+	ctx.Header("Access-Control-Allow-Headers", "X-Custom-Header")
 	obj := gin.H{"code": fmt.Sprintf("%d", http.StatusOK), "message": "操作成功", "data": gifId}
 	ctx.JSON(http.StatusOK, obj)
 }

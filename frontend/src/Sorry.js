@@ -18,6 +18,13 @@ import React, { Component } from 'react';
 //   }
 // }
 
+class Screen extends Component {
+	render() {
+		return (
+			<img src={"http://emilyxiner.xin:8081/gif/" + this.props.gifId} alt="gif"/>
+		);
+	}
+}
 
 class Words extends Component {
 
@@ -25,10 +32,10 @@ class Words extends Component {
 
 	constructor(props) {
 		super(props);
-		// const url = "http://emilyxiner.xin:8081/generateGif";
 		this.state = {
 			wordList : [],
 			templateType: "wangjingze",
+			gifId: "",
 		};
 	}
 
@@ -38,7 +45,28 @@ class Words extends Component {
 			"template_type": this.state.templateType,
 		};
 		var payloadStr = JSON.stringify(payload);
-		alert(payloadStr);
+		
+		fetch(this.url, {
+			method: "POST",
+			headers:{
+				// "Content-Type":"application/json",
+			},
+			body:payloadStr,
+		}).then(function(res){
+			if (res.ok) {
+				return res.json();
+			} else {
+				alert("not ok status:"+res.status);
+			}
+		}, function(e) {
+			alert("exception"+e);
+		}).then(function(text){
+			var gifId = text.data;
+			this.setState({
+				gifId: gifId,
+			});
+		}.bind(this));
+
 	}
 
 	
@@ -77,21 +105,21 @@ class Words extends Component {
 	renderWord(i) {
 		var thisref = "input"+i;
 		return (
-			<input type="text" ref={thisref} value={this.state.wordList[i]} onChange={()=>this.handleChange(i)}/>
+			<li><input type="text" ref={thisref} value={this.state.wordList[i]} onChange={()=>this.handleChange(i)}/></li>
 		);
 	}	
 
 	render() {
 		return (
 			<div>
-				<p>
+				
 				<ul>
-					<li>{this.renderWord(0)}</li>
-					<li>{this.renderWord(1)}</li>
-					<li>{this.renderWord(2)}</li>
-					<li>{this.renderWord(3)}</li>
+					{this.renderWord(0)}
+					{this.renderWord(1)}
+					{this.renderWord(2)}
+					{this.renderWord(3)}
 				</ul>
-				</p>
+				
 
 				<span>模板</span>
 				<input type="text" ref="templateType" value={this.state.templateType} onChange={()=>this.handleChangeTemplateType()}/>
@@ -100,6 +128,11 @@ class Words extends Component {
 				<button onClick={()=>this.Submit()}>
 					提交
 				</button>
+				</p>
+
+				<p>
+				<Screen gifId={this.state.gifId}>
+				</Screen>
 				</p>
 			</div>
 		);
